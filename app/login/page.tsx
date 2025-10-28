@@ -2,7 +2,6 @@
 
 import { FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -18,15 +17,16 @@ export default function LoginPage() {
     const email = String(formData.get('email') || '');
     const password = String(formData.get('password') || '');
 
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
-    console.log('handleSubmit triggered');
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!baseUrl) {
+      console.error('Missing NEXT_PUBLIC_API_URL');
+      alert('Missing NEXT_PUBLIC_API_URL. Set it in .env.local and restart.');
+      return;
+    }
 
     const response = await fetch(`${baseUrl}/api/restify/login`, {
       method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
@@ -37,7 +37,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push('/profile');
+    window.location.replace('/');
   }
 
   return (
