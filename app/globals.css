@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "ag-grid-community/styles/ag-grid.css";
+@import "ag-grid-community/styles/ag-theme-quartz.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -41,6 +43,16 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+}
+
+.ag-theme-quartz {
+  --ag-background-color: #fff;
+  --ag-header-background-color: #f9fafb;
+  --ag-header-foreground-color: #111827;
+  --ag-border-color: #e5e7eb;
+  --ag-row-hover-color: #f3f4f6;
+  --ag-font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto;
+  --ag-font-size: 0.875rem;
 }
 
 :root {
