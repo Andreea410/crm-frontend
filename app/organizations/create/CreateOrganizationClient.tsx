@@ -59,7 +59,7 @@ export default function CreateOrganizationClient() {
 
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
 
-      router.push('/organizations');
+      router.push('/organizations?success=1');
       router.refresh();
     } catch (err) {
       console.error('Error creating organization:', err);

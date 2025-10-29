@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import {useRouter, useSearchParams} from 'next/navigation';
 import OrganizationsTable from '@/components/OrganizationsTable';
 import Pagination from '@/components/Pagination';
 import FilterSearchBar from '@/components/FilterSearchBar';
@@ -14,8 +14,16 @@ export default function OrganizationsClient() {
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
     const abortRef = useRef<AbortController | null>(null);
+    const searchParams = useSearchParams();
     const router = useRouter();
+
+    useEffect(() => {
+        if (searchParams.get('success') === '1') {
+            setShowSuccess(true);
+        }
+    }, [searchParams]);
 
     const fetchOrganizations = useCallback(async () => {
         setIsLoading(true);
@@ -63,6 +71,35 @@ export default function OrganizationsClient() {
 
     return (
         <div>
+            {/* ✅ Success Alert */}
+            {showSuccess && (
+                <div className="mb-6 flex items-center justify-between rounded-md bg-green-500 px-4 py-3 text-white shadow">
+                    <div className="flex items-center space-x-2">
+                        <svg
+                            className="w-5 h-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                            />
+                        </svg>
+                        <span>Organization created.</span>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setShowSuccess(false)}
+                        className="text-white hover:text-gray-200"
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
             <div className="flex items-center justify-between mb-6">
                 <FilterSearchBar
                     trashed={trashed}
