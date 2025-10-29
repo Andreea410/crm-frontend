@@ -2,57 +2,41 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-type SearchBarProps = {
+type SearchInputProps = {
     placeholder?: string;
-    onSearch: (query: string) => void;
+    value: string;
+    onChange: (query: string) => void;
     debounceTime?: number;
 };
 
 export default function SearchBar({
-                                      placeholder = 'Search...',
-                                      onSearch,
-                                      debounceTime = 300,
-                                  }: SearchBarProps) {
-    const [query, setQuery] = useState('');
+                                        placeholder = 'Search…',
+                                        value,
+                                        onChange,
+                                        debounceTime = 300,
+                                    }: SearchInputProps) {
+    const [inputValue, setInputValue] = useState(value);
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        // Clear old debounce
         if (debounceRef.current) clearTimeout(debounceRef.current);
-
-        // Debounce logic
         debounceRef.current = setTimeout(() => {
-            onSearch(query.trim());
+            onChange(inputValue.trim());
         }, debounceTime);
-
-        // Cleanup
         return () => {
             if (debounceRef.current) clearTimeout(debounceRef.current);
         };
-    }, [query, debounceTime, onSearch]);
-
-    const handleReset = () => {
-        setQuery('');
-        onSearch(''); // trigger immediate reset
-    };
+    }, [inputValue, debounceTime, onChange]);
 
     return (
-        <div className="flex items-center gap-2">
-            <input
-                type="text"
-                placeholder={placeholder}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-64 rounded border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none"
-            />
-            {query && (
-                <button
-                    onClick={handleReset}
-                    className="text-sm text-gray-500 hover:text-gray-700"
-                >
-                    Reset
-                </button>
-            )}
-        </div>
+        <input
+            type="text"
+            name="search"
+            autoComplete="off"
+            placeholder={placeholder}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="relative px-6 py-3 w-full rounded-r focus:shadow-outline focus:outline-none"
+        />
     );
 }
