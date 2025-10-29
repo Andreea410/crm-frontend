@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import ContactsTable from '@/components/ContactsTable';
 import Pagination from '@/components/Pagination';
 import FilterSearchBar from '@/components/FilterSearchBar';
+import {useRouter, useSearchParams} from "next/navigation";
 
 export default function ContactsClient() {
     const [contacts, setContacts] = useState([]);
@@ -13,6 +14,22 @@ export default function ContactsClient() {
     const [lastPage, setLastPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const abortRef = useRef<AbortController | null>(null);
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const [showSuccess, setShowSuccess] = useState(false);
+
+    useEffect(() => {
+        if (searchParams.get('success') === '1') {
+            setShowSuccess(true);
+            const timer = setTimeout(() => {
+                setShowSuccess(false);
+                const url = new URL(window.location.href);
+                url.searchParams.delete('success');
+                router.replace(url.toString(), { scroll: false });
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [searchParams, router]);
 
     const fetchContacts = useCallback(async () => {
         setIsLoading(true);
@@ -60,6 +77,30 @@ export default function ContactsClient() {
 
     return (
         <div>
+            {showSuccess && (
+                <div className="mb-6 flex items-center justify-between rounded-md bg-green-500 px-4 py-3 text-white shadow">
+                    <div className="flex items-center space-x-2">
+                        <svg
+                            className="w-5 h-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Contact created.</span>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setShowSuccess(false)}
+                        className="text-white hover:text-gray-200"
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
+
             <div className="flex items-center justify-between mb-6">
                 <FilterSearchBar
                     trashed={trashed}
@@ -79,7 +120,9 @@ export default function ContactsClient() {
                     }}
                 />
 
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors">
+                <button
+                    onClick={() => router.push('/contacts/create')}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors">
                     Create Contact
                 </button>
             </div>
