@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import OrganizationsTable from '@/components/OrganizationsTable';
+import ContactsTable from '@/components/ContactsTable';
 import Pagination from '@/components/Pagination';
 import FilterSearchBar from '@/components/FilterSearchBar';
 
-export default function OrganizationsClient() {
-    const [organizations, setOrganizations] = useState([]);
+export default function ContactsClient() {
+    const [contacts, setContacts] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [trashed, setTrashed] = useState('');
     const [page, setPage] = useState(1);
@@ -14,9 +14,8 @@ export default function OrganizationsClient() {
     const [isLoading, setIsLoading] = useState(false);
     const abortRef = useRef<AbortController | null>(null);
 
-    const fetchOrganizations = useCallback(async () => {
+    const fetchContacts = useCallback(async () => {
         setIsLoading(true);
-
         try {
             const token = document.cookie
                 .split('; ')
@@ -28,7 +27,7 @@ export default function OrganizationsClient() {
             if (trashed) params.append('trashed', trashed);
             params.append('page', String(page));
 
-            const url = `${process.env.NEXT_PUBLIC_API_URL}/api/organizations?${params.toString()}`;
+            const url = `${process.env.NEXT_PUBLIC_API_URL}/api/contacts?${params.toString()}`;
 
             const res = await fetch(url, {
                 headers: {
@@ -37,26 +36,27 @@ export default function OrganizationsClient() {
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 credentials: 'include',
+                cache: 'no-store',
             });
 
-            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const json = await res.json();
-            const orgs = json?.props?.organizations?.data || [];
 
-            setOrganizations(orgs);
-            setLastPage(json?.props?.organizations?.last_page || 1);
+            const data = json?.props?.contacts?.data || [];
+            setContacts(data);
+            setLastPage(json?.props?.contacts?.last_page || 1);
         } catch (err) {
-            console.error('Error fetching organizations:', err);
-            setOrganizations([]);
+            console.error('Error fetching contacts:', err);
+            setContacts([]);
         } finally {
             setIsLoading(false);
         }
     }, [searchQuery, trashed, page]);
 
     useEffect(() => {
-        fetchOrganizations();
+        fetchContacts();
         return () => abortRef.current?.abort();
-    }, [fetchOrganizations]);
+    }, [fetchContacts]);
 
     return (
         <div>
@@ -65,7 +65,7 @@ export default function OrganizationsClient() {
                     trashed={trashed}
                     onTrashedChange={(value) => {
                         setTrashed(value);
-                        setPage(1); // reset to first page when filter changes
+                        setPage(1);
                     }}
                     searchValue={searchQuery}
                     onSearchChange={(value) => {
@@ -80,17 +80,17 @@ export default function OrganizationsClient() {
                 />
 
                 <button className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors">
-                    Create Organization
+                    Create Contact
                 </button>
             </div>
 
-            <h1 className="text-3xl font-bold mb-6">Organizations</h1>
+            <h1 className="text-3xl font-bold mb-6">Contacts</h1>
 
             {isLoading ? (
                 <div className="text-gray-500 text-center py-8">Loading...</div>
             ) : (
                 <>
-                    <OrganizationsTable organizations={organizations} />
+                    <ContactsTable contacts={contacts} />
                     <Pagination
                         currentPage={page}
                         lastPage={lastPage}
