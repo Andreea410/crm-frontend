@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import OrganizationsTable from '@/components/OrganizationsTable';
 import Pagination from '@/components/Pagination';
 import FilterSearchBar from '@/components/FilterSearchBar';
+
 
 export default function OrganizationsClient() {
     const [organizations, setOrganizations] = useState([]);
@@ -13,6 +15,7 @@ export default function OrganizationsClient() {
     const [lastPage, setLastPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const abortRef = useRef<AbortController | null>(null);
+    const router = useRouter();
 
     const fetchOrganizations = useCallback(async () => {
         setIsLoading(true);
@@ -79,7 +82,10 @@ export default function OrganizationsClient() {
                     }}
                 />
 
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors">
+                <button
+                    onClick={() => router.push('/organizations/create')}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors"
+                >
                     Create Organization
                 </button>
             </div>
